@@ -8,9 +8,9 @@
 
 
     <Button
-        android:id="@+id/true_button"
+        android:id="@+id/begin_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/start_test_label" />
+        android:text="@string/begin_test_label" />
 
 </LinearLayout>
