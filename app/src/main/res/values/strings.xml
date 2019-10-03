@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">FallDetect</string>
     <string name="begin_test_label">Begin Test</string>
-    <string name="intro_label">Introduction to Test Below</string>
+    <string name="intro_label">Introduction to Test</string>
     <string name="start_test_label">Start Test</string>
+    <string name="intro_description">Description of Test Here</string>
 </resources>
