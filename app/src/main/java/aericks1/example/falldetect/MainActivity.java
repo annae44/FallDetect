@@ -9,16 +9,16 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button mStartButton;
+    private Button mBeginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mStartButton = (Button) findViewById(R.id.start_button);
+        mBeginButton = (Button) findViewById(R.id.begin_button);
 
-        mStartButton.setOnClickListener(new View.OnClickListener() {
+        mBeginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 System.out.println("Button Clicked");
