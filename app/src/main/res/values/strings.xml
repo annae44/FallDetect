@@ -3,6 +3,7 @@
     <string name="begin_test_label">Begin Test</string>
     <string name="intro_label">Introduction to Test Below</string>
     <string name="start_test_label">Start Test</string>
-    <string name="intro_description">Description of Test Here</string>
+    <string name="intro_description">Description of Test Here. There will be a long description
+                                     with lots of words</string>
     <string name="prepare_text">Please Put your phone in the pocket</string>
 </resources>
