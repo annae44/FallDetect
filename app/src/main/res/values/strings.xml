@@ -6,4 +6,5 @@
     <string name="intro_description">Description of Test Here. There will be a detailed description
                                      with useful words right here.</string>
     <string name="prepare_text">Please Put your phone in the pocket</string>
+    <string name="start_again">Do you want to take the test again</string>>
 </resources>
