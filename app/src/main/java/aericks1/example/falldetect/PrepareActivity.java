@@ -37,7 +37,7 @@ public class PrepareActivity extends AppCompatActivity {
                 startActivity(CompleteIntent);
             }
 
-            timerTextView.setText(String.format("%02d", seconds));
+            timerTextView.setText(String.format("%02d seconds", seconds));
             timerHandler.postDelayed(this, 500);
         }
     };

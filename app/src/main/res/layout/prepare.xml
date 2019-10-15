@@ -7,8 +7,15 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/prepare_text">
+        android:text="@string/prepare_text1"
+        android:textSize="24sp">
+    </TextView>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/prepare_text2"
+        android:textSize="24sp">
     </TextView>
 
     <TextView
