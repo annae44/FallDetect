@@ -22,7 +22,24 @@
         android:id="@+id/timer_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+    </TextView>
 
+    <TextView
+        android:id="@+id/sensor_text_view_x"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </TextView>
+
+    <TextView
+        android:id="@+id/sensor_text_view_y"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </TextView>
+
+    <TextView
+        android:id="@+id/sensor_text_view_z"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     </TextView>
 
 </LinearLayout>
