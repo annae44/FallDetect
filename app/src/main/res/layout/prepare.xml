@@ -30,6 +30,7 @@
         android:layout_height="wrap_content"
         android:text="Light Sensor X: %1$.2f">
     </TextView>
+<!--
 
     <TextView
         android:id="@+id/sensor_text_view_y"
@@ -44,5 +45,6 @@
         android:layout_height="wrap_content"
         android:text="Light Sensor Z: %1$.2f">
     </TextView>
+-->
 
 </LinearLayout>

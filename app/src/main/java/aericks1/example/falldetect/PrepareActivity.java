@@ -18,9 +18,10 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     private SensorManager mSensorManager;
     private Sensor mSensorAccelerometer;
+
     private TextView mTextSensorX;
-    private TextView mTextSensorY;
-    private TextView mTextSensorZ;
+    //private TextView mTextSensorY;
+    //private TextView mTextSensorZ;
 
     boolean during = false;
     boolean done = false;
@@ -57,24 +58,25 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.prepare);
 
-        timerHandler.postDelayed(timerRunnable, 0);
-        timerTextView = (TextView) findViewById(R.id.timer_text_view);
-
-        mTextSensorX = (TextView) findViewById(R.id.sensor_text_view_x);
-        mTextSensorY = (TextView) findViewById(R.id.sensor_text_view_y);
-        mTextSensorZ = (TextView) findViewById(R.id.sensor_text_view_z);
-
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED);
+        TextView mTextSensorX;
+        //mTextSensorY = (TextView) findViewById(R.id.sensor_text_view_y);
+        //mTextSensorZ = (TextView) findViewById(R.id.sensor_text_view_z);
+
+        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
         String sensor_error = getResources().getString(R.string.error_no_sensor);
 
-        if (mSensorAccelerometer == null) {
-            mTextSensorX.setText(sensor_error);
-            mTextSensorY.setText(sensor_error);
-            mTextSensorZ.setText(sensor_error);
-        }
+        //if (mSensorAccelerometer == null) {
+         //   mTextSensorX.setText(getResources().getString(R.string.error_no_sensor));
+            //mTextSensorY.setText(sensor_error);
+            //mTextSensorZ.setText(sensor_error);
+        //}
+
+
+        timerHandler.postDelayed(timerRunnable, 0);
+        timerTextView = (TextView) findViewById(R.id.timer_text_view);
     }
 
     @Override
@@ -95,14 +97,16 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+        int sensorType = sensorEvent.sensor.getType();
         float currentValueX = sensorEvent.values[0];
-        mTextSensorX.setText(getResources().getString(R.string.sensor_text_view_x, currentValueX));
+        //mTextSensorX.setText(getResources().getString(R.string.sensor_text_view_x, currentValueX));
+        mTextSensorX.setText(String.format("Light Sensor X: %1$.2f", currentValueX));
 
-        float currentValueY = sensorEvent.values[0];
-        mTextSensorY.setText(getResources().getString(R.string.sensor_text_view_y, currentValueY));
+        //float currentValueY = sensorEvent.values[1];
+        //mTextSensorY.setText(getResources().getString(R.string.sensor_text_view_y, currentValueY));
 
-        float currentValueZ = sensorEvent.values[0];
-        mTextSensorZ.setText(getResources().getString(R.string.sensor_text_view_z, currentValueZ));
+        //float currentValueZ = sensorEvent.values[2];
+        //mTextSensorZ.setText(getResources().getString(R.string.sensor_text_view_z, currentValueZ));
     }
 
     @Override
