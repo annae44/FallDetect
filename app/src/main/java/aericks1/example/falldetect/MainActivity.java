@@ -10,6 +10,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     private Button mBeginButton;
+    public final static String TAG = "FallDetect";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
