@@ -13,6 +13,9 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.FileWriter;
+import java.util.ArrayList;
+
 
 public class PrepareActivity extends AppCompatActivity implements SensorEventListener {
     private static final int MESSAGE_ID = 0;
@@ -29,6 +32,8 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     boolean during = false;
     boolean done = false;
+
+    ArrayList<Float> sensorArray = new ArrayList<Float>();
 
     Handler timerHandler = new Handler() {
         @Override
@@ -58,11 +63,13 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
                 }
-            } else {
+            } else if (seconds >=10) {
+                onStop();
                 Intent CompleteIntent = new Intent(getApplicationContext(), CompleteActivity.class);
                 startActivity(CompleteIntent);
                 Log.i(MainActivity.TAG, "in the else of run()");
                 doneFlag = true;
+                // writeToFile(sensorArray);
             }
 
             if ( ! doneFlag ) {
@@ -88,11 +95,27 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
         TextView mTextSensor;
 
-        mSensorLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         String sensor_error = getResources().getString(R.string.error_no_sensor);
     }
+
+    /*  ATTEMPTED WRITE TO FILE
+    public static void writeToFile(ArrayList<Float> array) throws exception {
+        String csv = "\\Desktop\\Class\\CS275\\GroupProject\\sensorData.csv"; //CHANGE AS NEEDED
+
+        CSVWriter writer = new CSVWriter(new FileWriter(csv));
+
+        for (int j = 0; j < array.length; j++) {
+            writer.append(String.valueOf(array[j]));
+            writer.write("\n");
+        }
+
+
+        writer.close();
+    }
+    */
+
 
     @Override
     protected void onStart() {
@@ -118,24 +141,22 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         int sensorType = sensorEvent.sensor.getType();
-        if (sensorType == Sensor.TYPE_LIGHT) {
-            float currentValueX = sensorEvent.values[0];
-            mTextSensor.setText(String.format("Light Sensor X: %.2f", currentValueX));
-        } else if (sensorType == Sensor.TYPE_ACCELEROMETER) {
+        if (sensorType == Sensor.TYPE_ACCELEROMETER) {
             float currentValueX = sensorEvent.values[0];
             float currentValueY = sensorEvent.values[1];
             float currentValueZ = sensorEvent.values[2];
             Log.i(MainActivity.TAG, "accel " + currentValueX + " " + currentValueY + " " + currentValueZ);
             String s = String.format("Accel %.2f %.2f %.2f", currentValueX, currentValueY, currentValueZ);
             mTextSensor.setText(s);
+
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+            sensorArray.add(sensorEvent.values[2]);
+
         } else {
             Log.i(MainActivity.TAG, "sensor type " + sensorType);
         }
-        //float currentValueY = sensorEvent.values[1];
-        //mTextSensorY.setText(getResources().getString(R.string.sensor_text_view_y, currentValueY));
-
-        //float currentValueZ = sensorEvent.values[2];
-        //mTextSensorZ.setText(getResources().getString(R.string.sensor_text_view_z, currentValueZ));
     }
 
     @Override
