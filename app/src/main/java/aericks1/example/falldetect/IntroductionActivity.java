@@ -21,6 +21,7 @@ public class IntroductionActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PrepareActivity.class);
                 startActivity(intent);
+
             }
         });
     }

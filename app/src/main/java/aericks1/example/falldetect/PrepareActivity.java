@@ -5,8 +5,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.Vibrator;
 import android.util.Log;
 import android.widget.TextView;
 import android.os.Handler;
@@ -62,13 +65,22 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 if (seconds >= 5){
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
+                    ToneGenerator tone1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                    tone1.startTone(ToneGenerator.TONE_SUP_PIP, 800);
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    v.vibrate(800);
                 }
+
             } else if (seconds >=10) {
                 onStop();
                 Intent CompleteIntent = new Intent(getApplicationContext(), CompleteActivity.class);
                 startActivity(CompleteIntent);
                 Log.i(MainActivity.TAG, "in the else of run()");
                 doneFlag = true;
+                ToneGenerator tone1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                tone1.startTone(ToneGenerator.TONE_SUP_PIP, 1000);
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(800);
                 // writeToFile(sensorArray);
             }
 
