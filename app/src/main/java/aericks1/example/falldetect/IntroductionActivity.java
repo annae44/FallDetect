@@ -19,9 +19,7 @@ public class IntroductionActivity extends AppCompatActivity {
         mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PrepareActivity.class);
-                startActivity(intent);
-
+                finish();
             }
         });
     }

@@ -26,9 +26,7 @@ public class CompleteActivity extends AppCompatActivity {
                 System.out.println("Button Clicked");
 
                 // open new activity using an intent
-                Intent IntroIntent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(IntroIntent);
-
+                finish();
             }
         });
     }

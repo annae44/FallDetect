@@ -73,8 +73,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
             } else if (seconds >=10) {
                 onStop();
-                Intent CompleteIntent = new Intent(getApplicationContext(), CompleteActivity.class);
-                startActivity(CompleteIntent);
+                finish();
                 Log.i(MainActivity.TAG, "in the else of run()");
                 doneFlag = true;
                 ToneGenerator tone1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
