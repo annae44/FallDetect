@@ -16,7 +16,7 @@ public class CompleteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.complete);
 
-        sendEmail();
+        //sendEmail();
 
         mStartAgain = (Button) findViewById(R.id.start_again_button);
 
@@ -31,7 +31,7 @@ public class CompleteActivity extends AppCompatActivity {
         });
     }
 
-    protected void sendEmail() {
+    /*protected void sendEmail() {
         Log.i("Send email", "");
         String[] TO = {"aericks1@uvm.edu"};
         String[] CC = {""};
@@ -52,5 +52,7 @@ public class CompleteActivity extends AppCompatActivity {
             Toast.makeText(CompleteActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
         }
     }
+
+     */
 
 }

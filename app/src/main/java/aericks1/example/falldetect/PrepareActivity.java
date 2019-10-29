@@ -7,16 +7,19 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
 import android.widget.TextView;
 import android.os.Handler;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -27,14 +30,10 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     private SensorManager mSensorManager;
     private Sensor mSensorAccelerometer;
-    private Sensor mSensorLight;
 
     private TextView mTextSensor = null;
-    //private TextView mTextSensorY;
-    //private TextView mTextSensorZ;
 
     boolean during = false;
-    boolean done = false;
 
     ArrayList<Float> sensorArray = new ArrayList<Float>();
 
@@ -80,7 +79,19 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 tone1.startTone(ToneGenerator.TONE_SUP_PIP, 1000);
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(800);
+                try {
+                    Writer.main(sensorArray);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                sendEmail();
                 // writeToFile(sensorArray);
+                try {
+                    Writer.main(sensorArray);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(PrepareActivity.this, "Cannot Write to File.", Toast.LENGTH_SHORT).show();
+                }
             }
 
             if ( ! doneFlag ) {
@@ -99,33 +110,14 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         Log.i(MainActivity.TAG, "onCreate()");
         setContentView(R.layout.prepare);
 
-        //jdh
         mTextSensor = findViewById(R.id.sensor_text_view_x);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-        TextView mTextSensor;
 
         mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         String sensor_error = getResources().getString(R.string.error_no_sensor);
     }
-
-    /*  ATTEMPTED WRITE TO FILE
-    public static void writeToFile(ArrayList<Float> array) throws exception {
-        String csv = "\\Desktop\\Class\\CS275\\GroupProject\\sensorData.csv"; //CHANGE AS NEEDED
-
-        CSVWriter writer = new CSVWriter(new FileWriter(csv));
-
-        for (int j = 0; j < array.length; j++) {
-            writer.append(String.valueOf(array[j]));
-            writer.write("\n");
-        }
-
-
-        writer.close();
-    }
-    */
 
 
     @Override
@@ -163,7 +155,9 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             float x = sensorEvent.values[0];
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
-            sensorArray.add(sensorEvent.values[2]);
+            sensorArray.add(x);
+            sensorArray.add(y);
+            sensorArray.add(z);
 
         } else {
             Log.i(MainActivity.TAG, "sensor type " + sensorType);
@@ -173,6 +167,32 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    protected void sendEmail() {
+        Log.i("Send email", "");
+        String[] TO = {"aericks1@uvm.edu"};
+        String[] CC = {""};
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+
+        String content = sensorArray.get(0).toString() + ", "
+                         + sensorArray.get(1).toString() + ", "
+                         + sensorArray.get(2).toString();
+
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+        emailIntent.putExtra(Intent.EXTRA_CC, CC);
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "FallDetect Results");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Here are the results:\n" + content);
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            finish();
+            Log.i("Finished sending email.", "");
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(PrepareActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 
