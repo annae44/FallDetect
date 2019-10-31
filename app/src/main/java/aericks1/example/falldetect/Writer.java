@@ -46,7 +46,6 @@ public class Writer extends Application {
 
          **/
 
-        //String filename = "/Users/annafron21/Desktop/sensorData.rtf";
         Context context = getContext();
         String filename = context.getFilesDir().getPath() + "/sensorData.csv";
         File file = new File(filename);
