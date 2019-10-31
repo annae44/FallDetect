@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             seconds = seconds % 60;
 
             if(!during) {
-                if (seconds >= 5){
+                if (seconds >= 2){
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
                     ToneGenerator tone1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
@@ -70,7 +71,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                     v.vibrate(800);
                 }
 
-            } else if (seconds >=10) {
+            } else if (seconds >= 2) {
                 onStop();
                 finish();
                 Log.i(MainActivity.TAG, "in the else of run()");
@@ -171,13 +172,20 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     protected void sendEmail() {
         Log.i("Send email", "");
-        String[] TO = {"aericks1@uvm.edu"};
+        //String[] TO = {"aericks1@uvm.edu"};
+        String[] TO = {"afronhof@uvm.edu"};
         String[] CC = {""};
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
 
+        String filename = "sensorData.csv";
+        Context c = Writer.getContext();
+        File fileLocation = new File(c.getFilesDir(), filename);
+        Uri file = Uri.parse("file://"+fileLocation);
+
+
         String content = sensorArray.get(0).toString() + ", "
-                         + sensorArray.get(1).toString() + ", "
-                         + sensorArray.get(2).toString();
+                + sensorArray.get(1).toString() + ", "
+                + sensorArray.get(2).toString();
 
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("text/plain");
@@ -185,6 +193,9 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         emailIntent.putExtra(Intent.EXTRA_CC, CC);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "FallDetect Results");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "Here are the results:\n" + content);
+        //c.grantUriPermission("aericks1.example.falldetect", file, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        emailIntent.putExtra(Intent.EXTRA_STREAM, file);
 
         try {
             startActivity(Intent.createChooser(emailIntent, "Send mail..."));
@@ -195,4 +206,3 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         }
     }
 }
-
