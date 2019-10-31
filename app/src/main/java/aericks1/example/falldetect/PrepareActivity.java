@@ -38,7 +38,6 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     boolean during = false;
 
 
-
     ArrayList<Float> sensorArray = new ArrayList<Float>();
 
     private static Context c;
@@ -187,7 +186,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
 
         String filename = "sensorData.csv";
-        File fileLocation = new File(c.getFilesDir().getAbsolutePath(), filename);
+        File fileLocation = new File(c.getExternalCacheDir(), filename);
         Uri file = Uri.parse("file://"+fileLocation);
 
         emailIntent.setData(Uri.parse("mailto:"));
@@ -196,7 +195,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         emailIntent.putExtra(Intent.EXTRA_CC, CC);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "FallDetect Results");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "Here are the results:\n");
-        //c.grantUriPermission("aericks1.example.falldetect", file, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        c.grantUriPermission("aericks1.example.falldetect", file, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.putExtra(Intent.EXTRA_STREAM, file);
 

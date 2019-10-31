@@ -15,7 +15,8 @@ public class Writer extends Application {
 
     public static void main(ArrayList<Float> array, Context context) throws IOException {
 
-        String filename = context.getFilesDir().getAbsolutePath() + "/sensorData.csv";
+        String filename = context.getExternalCacheDir() + "/sensorData.csv";
+
         FileOutputStream file = new FileOutputStream(filename);
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(file);
 
