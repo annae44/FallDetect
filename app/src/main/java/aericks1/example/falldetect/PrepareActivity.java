@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import android.content.Context;
 
 
 public class PrepareActivity extends AppCompatActivity implements SensorEventListener {
@@ -36,7 +37,14 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     boolean during = false;
 
+
+
     ArrayList<Float> sensorArray = new ArrayList<Float>();
+
+    private static Context c;
+    public static Context getContext() {
+        return c;
+    }
 
     Handler timerHandler = new Handler() {
         @Override
@@ -47,7 +55,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         }
     };
 
-    Runnable timerRunnable = new Runnable() {
+    final Runnable timerRunnable = new Runnable() {
 
         @Override
         public void run() {
@@ -58,11 +66,11 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             }
 
             long millis = System.currentTimeMillis();
-            int seconds = (int) (millis / 1000) - (int)startTime;
+            int seconds = (int) (millis / 1000) - (int) startTime;
             seconds = seconds % 60;
 
-            if(!during) {
-                if (seconds >= 2){
+            if (!during) {
+                if (seconds >= 2) {
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
                     ToneGenerator tone1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
@@ -71,7 +79,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                     v.vibrate(800);
                 }
 
-            } else if (seconds >= 2) {
+            } else if (seconds >= 5) {
                 onStop();
                 finish();
                 Log.i(MainActivity.TAG, "in the else of run()");
@@ -81,21 +89,20 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(800);
                 try {
-                    Writer.main(sensorArray);
+                    Writer.main(sensorArray, c);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 sendEmail();
-                // writeToFile(sensorArray);
                 try {
-                    Writer.main(sensorArray);
+                    Writer.main(sensorArray, c);
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(PrepareActivity.this, "Cannot Write to File.", Toast.LENGTH_SHORT).show();
                 }
             }
 
-            if ( ! doneFlag ) {
+            if (!doneFlag) {
                 //timerTextView.setText(String.format("%02d seconds", seconds));
                 String s = String.format("%d seconds", seconds);
                 timerHandler.obtainMessage(MESSAGE_ID, s).sendToTarget();
@@ -118,6 +125,8 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         String sensor_error = getResources().getString(R.string.error_no_sensor);
+
+        c = getApplicationContext();
     }
 
 
@@ -172,27 +181,21 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     protected void sendEmail() {
         Log.i("Send email", "");
-        //String[] TO = {"aericks1@uvm.edu"};
-        String[] TO = {"afronhof@uvm.edu"};
+        String[] TO = {"aericks1@uvm.edu"};
+        //String[] TO = {"afronhof@uvm.edu"};
         String[] CC = {""};
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
 
         String filename = "sensorData.csv";
-        Context c = Writer.getContext();
-        File fileLocation = new File(c.getFilesDir(), filename);
+        File fileLocation = new File(c.getFilesDir().getAbsolutePath(), filename);
         Uri file = Uri.parse("file://"+fileLocation);
-
-
-        String content = sensorArray.get(0).toString() + ", "
-                + sensorArray.get(1).toString() + ", "
-                + sensorArray.get(2).toString();
 
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("text/plain");
         emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
         emailIntent.putExtra(Intent.EXTRA_CC, CC);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "FallDetect Results");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, "Here are the results:\n" + content);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Here are the results:\n");
         //c.grantUriPermission("aericks1.example.falldetect", file, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.putExtra(Intent.EXTRA_STREAM, file);
