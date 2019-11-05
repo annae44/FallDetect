@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -185,9 +186,12 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         String[] CC = {""};
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
 
+        Uri file = null;
         String filename = "sensorData.csv";
         File fileLocation = new File(c.getExternalCacheDir(), filename);
-        Uri file = Uri.parse("file://"+fileLocation);
+        //file = Uri.parse("file://"+fileLocation);
+        file = FileProvider.getUriForFile(PrepareActivity.this,
+                getString(R.string.file_provider_authority), fileLocation);
 
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("text/plain");

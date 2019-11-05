@@ -12,4 +12,5 @@
     <string name="sensor_text_view_y">"Light Sensor Y: %1$.2f"</string>
     <string name="sensor_text_view_z">"Light Sensor Z: %1$.2f"</string>
     <string name="error_no_sensor">No sensor</string>
+    <string name="file_provider_authority" translatable="false">aericks1.example.falldetect.fileprovider</string>
 </resources>
