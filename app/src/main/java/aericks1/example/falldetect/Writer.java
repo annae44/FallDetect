@@ -21,10 +21,10 @@ public class Writer extends Application {
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(file);
 
 
-        for (int j = 0; j < array.size(); j+=3) {
-            outputStreamWriter.write(array.get(j).toString());
-            outputStreamWriter.write(array.get(j+1).toString());
-            outputStreamWriter.write(array.get(j+2).toString());
+        for (int j = 0; j < array.size(); j += 3) {
+            outputStreamWriter.write(array.get(j).toString() + ", ");
+            outputStreamWriter.write(array.get(j + 1).toString()  + ", ");
+            outputStreamWriter.write(array.get(j + 2).toString());
             outputStreamWriter.write("\n");
         }
 
