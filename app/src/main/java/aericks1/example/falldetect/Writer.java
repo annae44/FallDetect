@@ -9,9 +9,10 @@ import java.util.ArrayList;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
+import android.widget.TextView;
 
 public class Writer extends Application {
-
 
     public static void main(ArrayList<Float> array, Context context) throws IOException {
 
@@ -19,7 +20,6 @@ public class Writer extends Application {
 
         FileOutputStream file = new FileOutputStream(filename);
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(file);
-
 
         for (int j = 0; j < array.size(); j += 3) {
             outputStreamWriter.write(array.get(j).toString() + ", ");

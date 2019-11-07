@@ -38,6 +38,12 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     boolean during = false;
 
+    private static final String TAG = "SimpleJNI";
+    static {
+        System.loadLibrary("native-lib");
+    }
+
+    public native String stringFromJNI();
 
     ArrayList<Float> sensorArray = new ArrayList<Float>();
 
@@ -79,7 +85,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                     v.vibrate(800);
                 }
 
-            } else if (seconds >= 5) {
+            } else if (seconds >= 30) {
                 onStop();
                 finish();
                 Log.i(MainActivity.TAG, "in the else of run()");
@@ -165,6 +171,11 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             float x = sensorEvent.values[0];
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
+
+
+            Log.i(TAG, stringFromJNI());
+            // TODO: JNI do processing -- pass in array of x, y, and z and returns transposed array
+
             sensorArray.add(x);
             sensorArray.add(y);
             sensorArray.add(z);
