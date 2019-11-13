@@ -85,7 +85,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                     v.vibrate(800);
                 }
 
-            } else if (seconds >= 30) {
+            } else if (seconds >= 5) {
                 onStop();
                 finish();
                 Log.i(MainActivity.TAG, "in the else of run()");
@@ -121,6 +121,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         Log.i(MainActivity.TAG, "onCreate()");
         setContentView(R.layout.prepare);
 
