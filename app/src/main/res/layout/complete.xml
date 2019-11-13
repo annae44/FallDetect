@@ -5,16 +5,24 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/complete_text">
-    </TextView>
+        android:layout_marginBottom="15dp"
+        android:padding="10dp"
+        android:textAlignment="center"
+        android:text="@string/complete_text"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="28sp"
+        android:textStyle="bold"></TextView>
 
     <Button
         android:id="@+id/start_again_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:textSize="20sp"
         android:text="@string/start_again" />
 
 </LinearLayout>
