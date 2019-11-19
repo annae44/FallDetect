@@ -1,14 +1,14 @@
 package aericks1.example.falldetect;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class MainActivity extends AppCompatActivity {
 
+    // initialize  variables
     private Button mBeginButton;
     public final static String TAG = "FallDetect";
     public final static int INTRO_REQUEST = 1;
@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        // handle the different activity requests
         if (requestCode == INTRO_REQUEST) {
             Intent intent = new Intent(getApplicationContext(), PrepareActivity.class);
             startActivityForResult(intent, PREPARE_REQUEST);
@@ -49,5 +51,6 @@ public class MainActivity extends AppCompatActivity {
             Intent IntroIntent = new Intent(getApplicationContext(), IntroductionActivity.class);
             startActivityForResult(IntroIntent, INTRO_REQUEST);
         }
+
     }
 }

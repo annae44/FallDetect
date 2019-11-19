@@ -1,4 +1,5 @@
 package aericks1.example.falldetect;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -20,38 +21,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import android.content.Context;
 
 
 public class PrepareActivity extends AppCompatActivity implements SensorEventListener {
+    // initialize random variables
     private static final int MESSAGE_ID = 0;
     TextView timerTextView;
     long startTime = -1;
-
-    private SensorManager mSensorManager;
-    private Sensor mSensorAccelerometer;
-
-    private TextView mTextSensor = null;
-
     boolean during = false;
 
+    // initialize sensor variables
+    private SensorManager mSensorManager;
+    private Sensor mSensorAccelerometer;
+    private TextView mTextSensor = null;
+    ArrayList<Float> sensorArray = new ArrayList<Float>();
+
+    // initiate and retrieve C++ integration files
     private static final String TAG = "SimpleJNI";
     static {
         System.loadLibrary("native-lib");
     }
-
     public native String stringFromJNI();
 
-    ArrayList<Float> sensorArray = new ArrayList<Float>();
-
+    // context method
     private static Context c;
     public static Context getContext() {
         return c;
     }
 
+    // Create timer handler
+    @SuppressLint("HandlerLeak")
     Handler timerHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -62,21 +63,25 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     };
 
     final Runnable timerRunnable = new Runnable() {
-
         @Override
         public void run() {
             boolean doneFlag = false;
 
+            // Reset Timer
             if (startTime == -1) {
                 startTime = (int) (System.currentTimeMillis() / 1000);
             }
 
+            // Calculate current seconds from start
             long millis = System.currentTimeMillis();
             int seconds = (int) (millis / 1000) - (int) startTime;
             seconds = seconds % 60;
 
+            // if its before the test begins
             if (!during) {
+                // if its been more than x seconds from start
                 if (seconds >= 2) {
+                    // start the test, make a sound, and make a vibration
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
                     ToneGenerator tone1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
@@ -85,7 +90,9 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                     v.vibrate(800);
                 }
 
+            // if its during the test and its been the duration of the test
             } else if (seconds >= 5) {
+                // stop the test, make a sounds, and make a vibration
                 onStop();
                 finish();
                 Log.i(MainActivity.TAG, "in the else of run()");
@@ -94,11 +101,15 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 tone1.startTone(ToneGenerator.TONE_SUP_PIP, 1000);
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(800);
+
+                // write to file
                 try {
                     Writer.main(sensorArray, c);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                // send email containing file
                 sendEmail();
                 try {
                     Writer.main(sensorArray, c);
@@ -108,13 +119,12 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 }
             }
 
+            // if the test is not complete
             if (!doneFlag) {
-                //timerTextView.setText(String.format("%02d seconds", seconds));
+                //  display the seconds on the screen
                 String s = String.format("%d seconds", seconds);
                 timerHandler.obtainMessage(MESSAGE_ID, s).sendToTarget();
                 timerHandler.postDelayed(this, 500);
-            } else {
-                return;
             }
         }
     };
@@ -125,10 +135,9 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         Log.i(MainActivity.TAG, "onCreate()");
         setContentView(R.layout.prepare);
 
+        // retrieve accelerometer data
         mTextSensor = findViewById(R.id.sensor_text_view_x);
-
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
         mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         String sensor_error = getResources().getString(R.string.error_no_sensor);
@@ -156,10 +165,15 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     protected void onStop() {
         super.onStop();
         mSensorManager.unregisterListener(this);
+
+        Log.i(TAG, stringFromJNI());
+        // TODO: JNI do processing -- pass in array of x, y, and z and returns transposed array
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+        // when there is a change in the sensor, add that value to the sensor array
+
         int sensorType = sensorEvent.sensor.getType();
         if (sensorType == Sensor.TYPE_ACCELEROMETER) {
             float currentValueX = sensorEvent.values[0];
@@ -173,14 +187,9 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
 
-
-            Log.i(TAG, stringFromJNI());
-            // TODO: JNI do processing -- pass in array of x, y, and z and returns transposed array
-
             sensorArray.add(x);
             sensorArray.add(y);
             sensorArray.add(z);
-
         } else {
             Log.i(MainActivity.TAG, "sensor type " + sensorType);
         }
@@ -192,12 +201,13 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     }
 
     protected void sendEmail() {
+        // set recipients
         Log.i("Send email", "");
         String[] TO = {"aericks1@uvm.edu"};
-        //String[] TO = {"afronhof@uvm.edu"};
         String[] CC = {""};
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
 
+        // retrieve content
         Uri file = null;
         String filename = "sensorData.csv";
         File fileLocation = new File(c.getExternalCacheDir(), filename);
@@ -205,6 +215,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         file = FileProvider.getUriForFile(PrepareActivity.this,
                 getString(R.string.file_provider_authority), fileLocation);
 
+        // create email
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("text/plain");
         emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
@@ -215,6 +226,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.putExtra(Intent.EXTRA_STREAM, file);
 
+        // send the email
         try {
             startActivity(Intent.createChooser(emailIntent, "Send mail..."));
             finish();
