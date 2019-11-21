@@ -15,7 +15,7 @@ Java_aericks1_example_falldetect_PrepareActivity_stringFromJNI(
 
 extern "C" JNIEXPORT jdoubleArray
 JNICALL
-Java_aericks1_example_falldetect_PrepareActivity_doProcessingJNI(
+Java_aericks1_example_falldetect_PrepareActivity_computeJNI(
         JNIEnv *env,
         jobject /* this */,
         jint num,

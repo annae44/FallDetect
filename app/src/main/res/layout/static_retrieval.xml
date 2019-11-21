@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="15dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/static_prepare_text1"
+        android:textColor="@android:color/black"
+        android:textSize="24sp">
+    </TextView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/static_prepare_text2"
+        android:textColor="@android:color/black"
+        android:textSize="24sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/timer_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="30dp"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="32sp"
+        android:textStyle="bold"></TextView>
+
+
+   <TextView
+       android:id="@+id/sensor_text_view_x"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="Light Sensor X: %1$.2f">
+   </TextView>
+
+    <!--
+           <TextView
+               android:id="@+id/sensor_text_view_y"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="Light Sensor Y: %1$.2f">
+           </TextView>
+
+           <TextView
+               android:id="@+id/sensor_text_view_z"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="Light Sensor Z: %1$.2f">
+           </TextView>
+       -->
+
+</LinearLayout>

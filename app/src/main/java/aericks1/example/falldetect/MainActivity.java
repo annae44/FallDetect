@@ -11,9 +11,13 @@ public class MainActivity extends AppCompatActivity {
     // initialize  variables
     private Button mBeginButton;
     public final static String TAG = "FallDetect";
-    public final static int INTRO_REQUEST = 1;
-    public final static int PREPARE_REQUEST = 2;
-    public final static int COMPLETE_REQUEST = 3;
+    public final static int STATIC_INTRO_REQUEST = 1;
+    public final static int STATIC_REQUEST = 2;
+
+    public final static int INTRO_REQUEST = 3;
+    public final static int PREPARE_REQUEST = 4;
+
+    public final static int COMPLETE_REQUEST = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Button Clicked");
 
                 // open new activity using an intent
-                Intent IntroIntent = new Intent(getApplicationContext(), IntroductionActivity.class);
-                startActivityForResult(IntroIntent, INTRO_REQUEST);
+                Intent staticIntro = new Intent(getApplicationContext(), StaticIntroductionActivity.class);
+                startActivityForResult(staticIntro, STATIC_INTRO_REQUEST);
             }
         });
 
@@ -41,15 +45,21 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         // handle the different activity requests
-        if (requestCode == INTRO_REQUEST) {
+        if (requestCode == STATIC_INTRO_REQUEST) {
+            Intent intent = new Intent(getApplicationContext(), StaticActitvity.class);
+            startActivityForResult(intent, STATIC_REQUEST);
+        } else if (requestCode == STATIC_REQUEST) {
+            Intent intent = new Intent(getApplicationContext(), IntroductionActivity.class);
+            startActivityForResult(intent, INTRO_REQUEST);
+        } else if (requestCode == INTRO_REQUEST) {
             Intent intent = new Intent(getApplicationContext(), PrepareActivity.class);
             startActivityForResult(intent, PREPARE_REQUEST);
         } else if (requestCode == PREPARE_REQUEST){
-            Intent CompleteIntent = new Intent(getApplicationContext(), CompleteActivity.class);
-            startActivity(CompleteIntent);
+            Intent intent = new Intent(getApplicationContext(), CompleteActivity.class);
+            startActivity(intent);
         } else if (requestCode == COMPLETE_REQUEST) {
-            Intent IntroIntent = new Intent(getApplicationContext(), IntroductionActivity.class);
-            startActivityForResult(IntroIntent, INTRO_REQUEST);
+            Intent intent = new Intent(getApplicationContext(), StaticActitvity.class);
+            startActivityForResult(intent, STATIC_INTRO_REQUEST);
         }
 
     }

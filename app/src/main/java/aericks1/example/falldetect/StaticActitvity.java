@@ -8,7 +8,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
@@ -18,14 +17,10 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
-public class PrepareActivity extends AppCompatActivity implements SensorEventListener {
+public class StaticActitvity extends AppCompatActivity implements SensorEventListener {
     // initialize random variables
     private static final int MESSAGE_ID = 0;
     TextView timerTextView;
@@ -37,13 +32,6 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     private Sensor mSensorAccelerometer;
     private TextView mTextSensor = null;
     ArrayList<Float> sensorArray = new ArrayList<Float>();
-
-    // initiate and retrieve C++ integration files
-    private static final String TAG = "SimpleJNI";
-    static {
-        System.loadLibrary("native-lib");
-    }
-    public native String stringFromJNI();
 
     // context method
     private static Context c;
@@ -67,12 +55,12 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         public void run() {
             boolean doneFlag = false;
 
-            // Reset Timer
+            // reset Timer
             if (startTime == -1) {
                 startTime = (int) (System.currentTimeMillis() / 1000);
             }
 
-            // Calculate current seconds from start
+            // calculate current seconds from start
             long millis = System.currentTimeMillis();
             int seconds = (int) (millis / 1000) - (int) startTime;
             seconds = seconds % 60;
@@ -90,7 +78,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                     v.vibrate(800);
                 }
 
-            // if its during the test and its been the duration of the test
+                // if its during the test and its been the duration of the test
             } else if (seconds >= 5) {
                 // stop the test, make a sounds, and make a vibration
                 onStop();
@@ -104,19 +92,19 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
                 // write to file
                 try {
-                    Writer.main(sensorArray, c, 2);
+                    Writer.main(sensorArray, c, 1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 // send email containing file
-                sendEmail();
+                //sendEmail();
                 /*
                 try {
-                    Writer.main(sensorArray, c, 2);
+                    Writer.main(sensorArray, c);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(PrepareActivity.this, "Cannot Write to File.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StaticActitvity.this, "Cannot Write to File.", Toast.LENGTH_SHORT).show();
                 }
 
                  */
@@ -136,7 +124,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         super.onCreate(savedInstanceState);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         Log.i(MainActivity.TAG, "onCreate()");
-        setContentView(R.layout.prepare);
+        setContentView(R.layout.static_retrieval);
 
         // retrieve accelerometer data
         mTextSensor = findViewById(R.id.sensor_text_view_x);
@@ -169,10 +157,6 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         super.onStop();
         mSensorManager.unregisterListener(this);
 
-        Log.i(TAG, stringFromJNI());
-
-        // TODO: JNI do processing -- pass in array of x, y, and z and returns transposed array
-        // ArrayList<Float> transposedArray =
     }
 
     @Override
@@ -203,55 +187,5 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
-    }
-
-    protected void sendEmail() {
-        // set recipients
-        Log.i("Send email", "");
-        String[] TO = {"aericks1@uvm.edu"};
-        String[] CC = {""};
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
-
-        // retrieve content - static file
-        Uri file1 = null;
-        String filename1 = "sensorData1.csv";
-        File fileLocation1 = new File(c.getExternalCacheDir(), filename1);
-        //file = Uri.parse("file://"+fileLocation);
-        file1 = FileProvider.getUriForFile(PrepareActivity.this,
-                getString(R.string.file_provider_authority), fileLocation1);
-
-        // retrieve content - dynamic file
-        Uri file2 = null;
-        String filename2 = "sensorData2.csv";
-        File fileLocation2 = new File(c.getExternalCacheDir(), filename2);
-        //file = Uri.parse("file://"+fileLocation);
-        file2 = FileProvider.getUriForFile(PrepareActivity.this,
-                getString(R.string.file_provider_authority), fileLocation2);
-
-        // create email
-        emailIntent.setData(Uri.parse("mailto:"));
-        emailIntent.setType("text/plain");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
-        emailIntent.putExtra(Intent.EXTRA_CC, CC);
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "FallDetect Results");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, "Here are the results:\n");
-
-
-        c.grantUriPermission("aericks1.example.falldetect", file1, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        emailIntent.putExtra(Intent.EXTRA_STREAM, file1);
-
-        c.grantUriPermission("aericks1.example.falldetect", file2, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        emailIntent.putExtra(Intent.EXTRA_STREAM, file2);
-
-        // send the email
-        try {
-            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-            finish();
-            Log.i("Finished sending email.", "");
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(PrepareActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
-        }
     }
 }

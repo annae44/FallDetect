@@ -9,9 +9,12 @@ import android.content.Context;
 
 public class Writer extends Application {
 
-    public static void main(ArrayList<Float> array, Context context) throws IOException {
+    public static void main(ArrayList<Float> array, Context context, int fileNum) throws IOException {
         // create file path
-        String filename = context.getExternalCacheDir() + "/sensorData.csv";
+        // fileNum = 0: the transposed file
+        // fileNum = 1: the static file
+        // fileNum = 2: the dynamic file
+        String filename = context.getExternalCacheDir() + "/sensorData" + fileNum + ".csv";
 
         // open ostream
         FileOutputStream file = new FileOutputStream(filename);
