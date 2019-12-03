@@ -208,9 +208,10 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     protected void sendEmail() {
         // set recipients
         Log.i("Send email", "");
-        String[] TO = {"aericks1@uvm.edu"};
+        //String[] TO = {"aericks1@uvm.edu"};
+        String[] TO = {"afronhof@uvm.edu"};
         String[] CC = {""};
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
 
         // retrieve content - static file
         Uri file1 = null;
@@ -228,6 +229,10 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         file2 = FileProvider.getUriForFile(PrepareActivity.this,
                 getString(R.string.file_provider_authority), fileLocation2);
 
+        ArrayList<Uri> files = new ArrayList<Uri>();
+        files.add(file1);
+        files.add(file2);
+
         // create email
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("text/plain");
@@ -239,11 +244,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
         c.grantUriPermission("aericks1.example.falldetect", file1, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        emailIntent.putExtra(Intent.EXTRA_STREAM, file1);
-
-        c.grantUriPermission("aericks1.example.falldetect", file2, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        emailIntent.putExtra(Intent.EXTRA_STREAM, file2);
+        emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
 
         // send the email
         try {
