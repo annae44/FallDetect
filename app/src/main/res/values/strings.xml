@@ -6,10 +6,12 @@
     <string name="intro_label">Introduction to Test Below</string>
     <string name="static_intro_label">Introduction to Static Test Below</string>
 
-    <string name="intro_description">Description of Test Here. There will be a detailed description
-                                     with useful words right here.</string>
-    <string name="static_intro_description">Description of Test Here. There will be a detailed description
-                                            with useful words right here.</string>
+    <string name="intro_description">Perform the 30 second chair stand test. Start seated,
+        then stand up and sit down as many times as you can in 30 seconds. There will be a sound
+    and vibration at the start and the end of the test.</string>
+    <string name="static_intro_description">Place the phone in your right pocket and stand
+        quietly with good posture for 30 seconds. There will be a sound and vibration at the
+        start and the end of the test.</string>
 
     <string name="prepare_text1">Please put your phone in your side pocket.</string>
     <string name="prepare_text2">The test will begin in: </string>
