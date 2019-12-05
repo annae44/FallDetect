@@ -19,7 +19,6 @@
             android:textSize="32sp">
         </TextView>
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,9 +26,8 @@
             android:paddingBottom="20dp"
             android:orientation="vertical">
 
-
             <ImageView
-                android:id="@+id/imageView1"
+                android:id="@+id/chairstandimage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -46,9 +44,8 @@
                 android:paddingRight="20dp"
                 android:text="@string/static_intro_description"
                 android:textColor="@android:color/black"
-                android:textSize="18sp">
+                android:textSize="20sp">
             </TextView>
-
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -69,6 +66,5 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </LinearLayout>
 </ScrollView>

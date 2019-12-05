@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.TextView;
 import android.os.Handler;
@@ -22,15 +23,17 @@ import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
+import java.util.Locale;
 
 
 public class PrepareActivity extends AppCompatActivity implements SensorEventListener {
     // initialize random variables
     private static final int MESSAGE_ID = 0;
     TextView timerTextView;
+    private TextToSpeech t4;
     long startTime = -1;
+    int countdown = 0;
     boolean during = false;
 
     // initialize sensor variables
@@ -38,14 +41,6 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     private Sensor mSensorAccelerometer;
     private TextView mTextSensor = null;
     ArrayList<Double> sensorArray = new ArrayList<Double>();
-
-    // initiate and retrieve C++ integration files
-    private static final String TAG = "SimpleJNI";
-    static {
-        System.loadLibrary("native-lib");
-    }
-    public native String stringFromJNI();
-    public native double[] computeJNI(int num, double inArrayStatic[], double inArrayDynamic[]);
 
     // context method
     private static Context c;
@@ -82,7 +77,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             // if its before the test begins
             if (!during) {
                 // if its been more than x seconds from start
-                if (seconds >= 2) {
+                if (seconds == 5) {
                     // start the test, make a sound, and make a vibration
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
@@ -93,7 +88,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 }
 
             // if its during the test and its been the duration of the test
-            } else if (seconds >= 5) {
+            } else if (seconds == 30) {
                 // stop the test, make a sounds, and make a vibration
                 onStop();
                 finish();
@@ -103,13 +98,19 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 tone1.startTone(ToneGenerator.TONE_SUP_PIP, 1000);
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(800);
-
             }
 
             // if the test is not complete
             if (!doneFlag) {
+                String s = "";
+                if (!during) {
+                    countdown = 5 - seconds;
+                    s = String.format("This test will begin in:\n%d seconds", countdown);
+                } else {
+                    countdown = 30 - seconds;
+                    s = String.format("Seconds remaining:\n%d seconds", countdown);
+                }
                 //  display the seconds on the screen
-                String s = String.format("%d seconds", seconds);
                 timerHandler.obtainMessage(MESSAGE_ID, s).sendToTarget();
                 timerHandler.postDelayed(this, 500);
             }
@@ -127,11 +128,28 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        String sensor_error = getResources().getString(R.string.error_no_sensor);
-
         c = getApplicationContext();
-    }
 
+        // initiate text to speech to allow directions to be read out loud
+        t4 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    t4.setLanguage(Locale.US);
+                    Log.i("TTS", "Speaker Initialized");
+
+                    String data = getString(R.string.static_prepare_text1);
+                    int speechStatus = t4.speak(data, TextToSpeech.QUEUE_FLUSH, null);
+
+                    if (speechStatus == TextToSpeech.ERROR) {
+                        Log.e("TTS", "Error in converting Text to Speech!");
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "TTS Initialization failed!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
     @Override
     protected void onStart() {
@@ -153,8 +171,6 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         super.onStop();
         mSensorManager.unregisterListener(this);
 
-        Log.i(TAG, stringFromJNI());
-
         // write to file
         try {
             Writer.main(sensorArray, c, 2);
@@ -162,46 +178,13 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             e.printStackTrace();
         }
 
-
-        // TODO: JNI do processing -- pass in array of x, y, and z and returns transposed array
-
-
-
-        //double[] doubleStaticArray = new double[sensorArrayStatic.size()];
-        /*
-
-        double[] doubleStaticArray = new double[sensorArray.size()];
-
-        // change once static array gets passed in
-        for (int i = 0; i < sensorArray.size(); i++){
-            doubleStaticArray[i] = sensorArray.get(i);
-        }
-
-        double[] doubleDynamicArray = new double[sensorArray.size()];
-        for (int i = 0; i < sensorArray.size(); i++){
-            doubleDynamicArray[i] = sensorArray.get(i);
-        }
-        Log.i(TAG, "Before JNI");
-        double[] transposedArray = computeJNI(1, doubleStaticArray, doubleDynamicArray);
-
-        Log.i(TAG, "After JNI");
-        for (int i=0; i<4; ++i) {
-            Log.i(TAG, "transposed[" + i + "] = " + transposedArray[i]);
-        }
-
-         */
-
-
-
-
-        // send email containing file
+        // send email containing files
         sendEmail();
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         // when there is a change in the sensor, add that value to the sensor array
-
         int sensorType = sensorEvent.sensor.getType();
         if (sensorType == Sensor.TYPE_ACCELEROMETER) {
             float currentValueX = sensorEvent.values[0];
@@ -229,27 +212,35 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
     }
 
+    public void onPause(){
+        if(t4 !=null){
+            t4.stop();
+            t4.shutdown();
+        }
+        super.onPause();
+    }
+
     protected void sendEmail() {
         // set recipients
         Log.i("Send email", "");
-        String[] TO = {"aericks1@uvm.edu"};
         String[] CC = {""};
         Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
 
         // retrieve content - static file
         Uri file1 = null;
-        String filename1 = "sensorData1.csv";
+        String filename1 = "staticSensorData.csv";
         File fileLocation1 = new File(c.getExternalCacheDir(), filename1);
         file1 = FileProvider.getUriForFile(PrepareActivity.this,
                 getString(R.string.file_provider_authority), fileLocation1);
 
         // retrieve content - dynamic file
         Uri file2 = null;
-        String filename2 = "sensorData2.csv";
+        String filename2 = "dynamicSensorData.csv";
         File fileLocation2 = new File(c.getExternalCacheDir(), filename2);
         file2 = FileProvider.getUriForFile(PrepareActivity.this,
                 getString(R.string.file_provider_authority), fileLocation2);
 
+        // add files to URI array list
         ArrayList<Uri> files = new ArrayList<Uri>();
         files.add(file1);
         files.add(file2);
@@ -257,12 +248,11 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         // create email
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("text/plain");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
         emailIntent.putExtra(Intent.EXTRA_CC, CC);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "FallDetect Results");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "Here are the results:\n");
 
-
+        // handle permissions
         c.grantUriPermission("aericks1.example.falldetect", file1, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);

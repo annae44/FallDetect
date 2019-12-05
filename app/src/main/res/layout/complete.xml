@@ -15,7 +15,8 @@
         android:text="@string/complete_text"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="28sp"
-        android:textStyle="bold"></TextView>
+        android:textStyle="bold">
+    </TextView>
 
     <Button
         android:id="@+id/start_again_button"

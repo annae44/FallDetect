@@ -6,7 +6,6 @@
     android:gravity="center"
     android:orientation="vertical">
 
-
     <Button
         android:id="@+id/begin_button"
         android:layout_width="wrap_content"

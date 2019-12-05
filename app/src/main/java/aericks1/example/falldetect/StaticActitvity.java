@@ -1,7 +1,6 @@
 package aericks1.example.falldetect;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -9,22 +8,27 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.TextView;
-import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class StaticActitvity extends AppCompatActivity implements SensorEventListener {
     // initialize random variables
     private static final int MESSAGE_ID = 0;
     TextView timerTextView;
+    private TextToSpeech t2;
     long startTime = -1;
+    int countdown = 0;
     boolean during = false;
 
     // initialize sensor variables
@@ -32,10 +36,6 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
     private Sensor mSensorAccelerometer;
     private TextView mTextSensor = null;
     ArrayList<Double> sensorArray = new ArrayList<Double>();
-
-
-    private static final String ARRAY_OF_VALUES = "aericks1.example.falldetect.array_of_values";
-
 
     // context method
     private static Context c;
@@ -72,7 +72,7 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
             // if its before the test begins
             if (!during) {
                 // if its been more than x seconds from start
-                if (seconds >= 2) {
+                if (seconds == 5) {
                     // start the test, make a sound, and make a vibration
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
@@ -82,8 +82,8 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
                     v.vibrate(800);
                 }
 
-                // if its during the test and its been the duration of the test
-            } else if (seconds >= 5) {
+            // if its during the test and its been the duration of the test
+            } else if (seconds == 20) {
                 // stop the test, make a sounds, and make a vibration
                 onStop();
                 finish();
@@ -97,8 +97,15 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
 
             // if the test is not complete
             if (!doneFlag) {
+                String s = "";
+                if (!during) {
+                    countdown = 5 - seconds;
+                    s = String.format("This test will begin in: \n %d seconds", countdown);
+                } else {
+                    countdown = 20 - seconds;
+                    s = String.format("Seconds remaining:\n %d seconds", countdown);
+                }
                 //  display the seconds on the screen
-                String s = String.format("%d seconds", seconds);
                 timerHandler.obtainMessage(MESSAGE_ID, s).sendToTarget();
                 timerHandler.postDelayed(this, 500);
             }
@@ -111,26 +118,34 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
         Log.i(MainActivity.TAG, "onCreate()");
         setContentView(R.layout.static_retrieval);
 
-        //attempt of passing in array. I believe I have the order mixed up
-        //double [] arr = getIntent().getDoubleArrayExtra(ARRAY_OF_VALUES);
-
         // retrieve accelerometer data
         mTextSensor = findViewById(R.id.sensor_text_view_x);
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        String sensor_error = getResources().getString(R.string.error_no_sensor);
-
         c = getApplicationContext();
+
+        // initiate text to speech to allow directions to be read out loud
+        t2 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    t2.setLanguage(Locale.US);
+                    Log.i("TTS", "Speaker Initialized");
+
+                    String data = getString(R.string.static_prepare_text1);
+                    int speechStatus = t2.speak(data, TextToSpeech.QUEUE_FLUSH, null);
+
+                    if (speechStatus == TextToSpeech.ERROR) {
+                        Log.e("TTS", "Error in converting Text to Speech!");
+                    }
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "TTS Initialization failed!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
-
-
-    public static Intent newIntent(Context packageContext, double [] arr) {
-        Intent intent = new Intent(packageContext, CompleteActivity.class);
-        intent.putExtra(ARRAY_OF_VALUES, arr);
-        return intent;
-    }
-
 
     @Override
     protected void onStart() {
@@ -152,22 +167,17 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
         super.onStop();
         mSensorManager.unregisterListener(this);
 
-
-
         // write to file
         try {
             Writer.main(sensorArray, c, 1);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         // when there is a change in the sensor, add that value to the sensor array
-
         int sensorType = sensorEvent.sensor.getType();
         if (sensorType == Sensor.TYPE_ACCELEROMETER) {
             float currentValueX = sensorEvent.values[0];
@@ -180,7 +190,6 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
             double x = sensorEvent.values[0];
             double y = sensorEvent.values[1];
             double z = sensorEvent.values[2];
-
 
             // add x, y, and z to the sensor array
             sensorArray.add(x);
@@ -195,5 +204,13 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    public void onPause(){
+        if(t2 !=null){
+            t2.stop();
+            t2.shutdown();
+        }
+        super.onPause();
     }
 }

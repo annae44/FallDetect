@@ -10,27 +10,21 @@ import android.content.Context;
 public class Writer extends Application {
 
     public static void main(ArrayList<Double> array, Context context, int fileNum) throws IOException {
-        // fileNum = 0: the transposed file
         // fileNum = 1: the static file
         // fileNum = 2: the dynamic file
-
         // create file path
-        String filename = context.getExternalCacheDir() + "/sensorData" + fileNum + ".csv";
+        String filename;
+        if (fileNum == 1) {
+            filename = context.getExternalCacheDir() + "/staticSensorData.csv";
+        } else {
+            filename = context.getExternalCacheDir() + "/dynamicSensorData.csv";
+        }
 
         // open ostream
         FileOutputStream file = new FileOutputStream(filename);
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(file);
 
-        // write the sensor data to file
-        /*
-        for (int j = 0; j < array.length; j += 3) {
-            outputStreamWriter.write(array[j] + ", ");
-            outputStreamWriter.write(array[j + 1] + ", ");
-            outputStreamWriter.write(array[j + 2] + "");
-            outputStreamWriter.write("\n");
-        }
-
-         */
+        // add all the sensor data to the files
         for (int j = 0; j < array.size(); j += 3) {
             outputStreamWriter.write(array.get(j).toString() + ", ");
             outputStreamWriter.write(array.get(j + 1).toString()  + ", ");
