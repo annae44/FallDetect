@@ -168,6 +168,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
 
         //double[] doubleStaticArray = new double[sensorArrayStatic.size()];
+        /*
 
         double[] doubleStaticArray = new double[sensorArray.size()];
 
@@ -187,6 +188,8 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         for (int i=0; i<4; ++i) {
             Log.i(TAG, "transposed[" + i + "] = " + transposedArray[i]);
         }
+
+         */
 
 
 
