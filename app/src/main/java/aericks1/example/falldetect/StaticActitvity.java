@@ -31,7 +31,11 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
     private SensorManager mSensorManager;
     private Sensor mSensorAccelerometer;
     private TextView mTextSensor = null;
-    ArrayList<Float> sensorArray = new ArrayList<Float>();
+    ArrayList<Double> sensorArray = new ArrayList<Double>();
+
+
+    private static final String ARRAY_OF_VALUES = "aericks1.example.falldetect.array_of_values";
+
 
     // context method
     private static Context c;
@@ -89,25 +93,6 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
                 tone1.startTone(ToneGenerator.TONE_SUP_PIP, 1000);
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(800);
-
-                // write to file
-                try {
-                    Writer.main(sensorArray, c, 1);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                // send email containing file
-                //sendEmail();
-                /*
-                try {
-                    Writer.main(sensorArray, c);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(StaticActitvity.this, "Cannot Write to File.", Toast.LENGTH_SHORT).show();
-                }
-
-                 */
             }
 
             // if the test is not complete
@@ -126,6 +111,9 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
         Log.i(MainActivity.TAG, "onCreate()");
         setContentView(R.layout.static_retrieval);
 
+        //attempt of passing in array. I believe I have the order mixed up
+        //double [] arr = getIntent().getDoubleArrayExtra(ARRAY_OF_VALUES);
+
         // retrieve accelerometer data
         mTextSensor = findViewById(R.id.sensor_text_view_x);
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -134,6 +122,13 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
         String sensor_error = getResources().getString(R.string.error_no_sensor);
 
         c = getApplicationContext();
+    }
+
+
+    public static Intent newIntent(Context packageContext, double [] arr) {
+        Intent intent = new Intent(packageContext, CompleteActivity.class);
+        intent.putExtra(ARRAY_OF_VALUES, arr);
+        return intent;
     }
 
 
@@ -157,6 +152,16 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
         super.onStop();
         mSensorManager.unregisterListener(this);
 
+
+
+        // write to file
+        try {
+            Writer.main(sensorArray, c, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Override
@@ -172,13 +177,16 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
             String s = String.format("Accel %.2f %.2f %.2f", currentValueX, currentValueY, currentValueZ);
             mTextSensor.setText(s);
 
-            float x = sensorEvent.values[0];
-            float y = sensorEvent.values[1];
-            float z = sensorEvent.values[2];
+            double x = sensorEvent.values[0];
+            double y = sensorEvent.values[1];
+            double z = sensorEvent.values[2];
 
+
+            // add x, y, and z to the sensor array
             sensorArray.add(x);
             sensorArray.add(y);
             sensorArray.add(z);
+
         } else {
             Log.i(MainActivity.TAG, "sensor type " + sensorType);
         }

@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 
 
@@ -36,7 +37,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     private SensorManager mSensorManager;
     private Sensor mSensorAccelerometer;
     private TextView mTextSensor = null;
-    ArrayList<Float> sensorArray = new ArrayList<Float>();
+    ArrayList<Double> sensorArray = new ArrayList<Double>();
 
     // initiate and retrieve C++ integration files
     private static final String TAG = "SimpleJNI";
@@ -44,6 +45,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         System.loadLibrary("native-lib");
     }
     public native String stringFromJNI();
+    public native double[] computeJNI(int num, double inArrayStatic[], double inArrayDynamic[]);
 
     // context method
     private static Context c;
@@ -102,24 +104,6 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(800);
 
-                // write to file
-                try {
-                    Writer.main(sensorArray, c, 2);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                // send email containing file
-                sendEmail();
-                /*
-                try {
-                    Writer.main(sensorArray, c, 2);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(PrepareActivity.this, "Cannot Write to File.", Toast.LENGTH_SHORT).show();
-                }
-
-                 */
             }
 
             // if the test is not complete
@@ -171,8 +155,44 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
 
         Log.i(TAG, stringFromJNI());
 
+        // write to file
+        try {
+            Writer.main(sensorArray, c, 2);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         // TODO: JNI do processing -- pass in array of x, y, and z and returns transposed array
-        // ArrayList<Float> transposedArray =
+
+
+
+        //double[] doubleStaticArray = new double[sensorArrayStatic.size()];
+
+        double[] doubleStaticArray = new double[sensorArray.size()];
+
+        // change once static array gets passed in
+        for (int i = 0; i < sensorArray.size(); i++){
+            doubleStaticArray[i] = sensorArray.get(i);
+        }
+
+        double[] doubleDynamicArray = new double[sensorArray.size()];
+        for (int i = 0; i < sensorArray.size(); i++){
+            doubleDynamicArray[i] = sensorArray.get(i);
+        }
+        Log.i(TAG, "Before JNI");
+        double[] transposedArray = computeJNI(1, doubleStaticArray, doubleDynamicArray);
+
+        Log.i(TAG, "After JNI");
+        for (int i=0; i<4; ++i) {
+            Log.i(TAG, "transposed[" + i + "] = " + transposedArray[i]);
+        }
+
+
+
+
+        // send email containing file
+        sendEmail();
     }
 
     @Override
@@ -188,10 +208,11 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             String s = String.format("Accel %.2f %.2f %.2f", currentValueX, currentValueY, currentValueZ);
             mTextSensor.setText(s);
 
-            float x = sensorEvent.values[0];
-            float y = sensorEvent.values[1];
-            float z = sensorEvent.values[2];
+            double x = sensorEvent.values[0];
+            double y = sensorEvent.values[1];
+            double z = sensorEvent.values[2];
 
+            // add x, y, and z to the sensor array
             sensorArray.add(x);
             sensorArray.add(y);
             sensorArray.add(z);
@@ -208,8 +229,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
     protected void sendEmail() {
         // set recipients
         Log.i("Send email", "");
-        //String[] TO = {"aericks1@uvm.edu"};
-        String[] TO = {"afronhof@uvm.edu"};
+        String[] TO = {"aericks1@uvm.edu"};
         String[] CC = {""};
         Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
 
@@ -217,7 +237,6 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         Uri file1 = null;
         String filename1 = "sensorData1.csv";
         File fileLocation1 = new File(c.getExternalCacheDir(), filename1);
-        //file = Uri.parse("file://"+fileLocation);
         file1 = FileProvider.getUriForFile(PrepareActivity.this,
                 getString(R.string.file_provider_authority), fileLocation1);
 
@@ -225,7 +244,6 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
         Uri file2 = null;
         String filename2 = "sensorData2.csv";
         File fileLocation2 = new File(c.getExternalCacheDir(), filename2);
-        //file = Uri.parse("file://"+fileLocation);
         file2 = FileProvider.getUriForFile(PrepareActivity.this,
                 getString(R.string.file_provider_authority), fileLocation2);
 

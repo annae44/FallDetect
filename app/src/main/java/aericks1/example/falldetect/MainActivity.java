@@ -48,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == STATIC_INTRO_REQUEST) {
             Intent intent = new Intent(getApplicationContext(), StaticActitvity.class);
             startActivityForResult(intent, STATIC_REQUEST);
+
+            //Intent intent = StaticActitvity.newIntent(getApplicationContext(), arr);
+            //startActivityForResult(intent, STATIC_REQUEST);
+
+
         } else if (requestCode == STATIC_REQUEST) {
             Intent intent = new Intent(getApplicationContext(), IntroductionActivity.class);
             startActivityForResult(intent, INTRO_REQUEST);

@@ -47,15 +47,12 @@ Java_aericks1_example_falldetect_PrepareActivity_computeJNI(
     emxArray_real_T dynamicArray;
     dynamicArray.data = dArr;
 
-    emxArray_real_T newArray;
-    newArray.data = rArr;
+    emxArray_real_T resultArray;
+    resultArray.data = rArr;
 
     // do the processing
     jdouble *workArr = new jdouble[num];
-    //for (int i=0; i<num; ++i) {
-    //    workArr[i] = DCM(staticArray.data[i], dArr[i], inArray);
-    //}
-    DCM(&staticArray, &dynamicArray, &newArray);
+    DCM(&staticArray, &dynamicArray, &resultArray);
 
     //test: syntax_error
 
