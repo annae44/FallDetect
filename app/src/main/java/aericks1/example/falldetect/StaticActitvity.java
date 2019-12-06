@@ -72,7 +72,7 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
             // if its before the test begins
             if (!during) {
                 // if its been more than x seconds from start
-                if (seconds == 5) {
+                if (seconds >= 5) {
                     // start the test, make a sound, and make a vibration
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
@@ -83,7 +83,7 @@ public class StaticActitvity extends AppCompatActivity implements SensorEventLis
                 }
 
             // if its during the test and its been the duration of the test
-            } else if (seconds == 20) {
+            } else if (seconds >= 20) {
                 // stop the test, make a sounds, and make a vibration
                 onStop();
                 finish();

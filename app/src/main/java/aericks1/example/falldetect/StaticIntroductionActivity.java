@@ -36,7 +36,7 @@ public class StaticIntroductionActivity extends AppCompatActivity {
                     t1.setLanguage(Locale.US);
                     Log.i("TTS", "Speaker Initialized");
 
-                    String data = getString(R.string.static_intro_label) + getString(R.string.static_intro_description);
+                    String data = getString(R.string.static_intro_label) + ". " + getString(R.string.static_intro_description);
                     int speechStatus = t1.speak(data, TextToSpeech.QUEUE_FLUSH, null);
 
                     if (speechStatus == TextToSpeech.ERROR) {

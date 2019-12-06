@@ -36,7 +36,7 @@ public class IntroductionActivity extends AppCompatActivity {
                     t3.setLanguage(Locale.US);
                     Log.i("TTS", "Speaker Initialized");
 
-                    String data = getString(R.string.static_intro_label) + getString(R.string.static_intro_description);
+                    String data = getString(R.string.intro_label) + ". " + getString(R.string.intro_description);
                     int speechStatus = t3.speak(data, TextToSpeech.QUEUE_FLUSH, null);
 
                     if (speechStatus == TextToSpeech.ERROR) {

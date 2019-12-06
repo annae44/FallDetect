@@ -77,7 +77,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
             // if its before the test begins
             if (!during) {
                 // if its been more than x seconds from start
-                if (seconds == 5) {
+                if (seconds >= 5) {
                     // start the test, make a sound, and make a vibration
                     startTime = (int) (System.currentTimeMillis() / 1000);
                     during = true;
@@ -88,7 +88,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                 }
 
             // if its during the test and its been the duration of the test
-            } else if (seconds == 30) {
+            } else if (seconds >= 30) {
                 // stop the test, make a sounds, and make a vibration
                 onStop();
                 finish();
@@ -138,7 +138,7 @@ public class PrepareActivity extends AppCompatActivity implements SensorEventLis
                     t4.setLanguage(Locale.US);
                     Log.i("TTS", "Speaker Initialized");
 
-                    String data = getString(R.string.static_prepare_text1);
+                    String data = getString(R.string.prepare_text1);
                     int speechStatus = t4.speak(data, TextToSpeech.QUEUE_FLUSH, null);
 
                     if (speechStatus == TextToSpeech.ERROR) {
